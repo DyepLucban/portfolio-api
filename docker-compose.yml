@@ -1,0 +1,39 @@
+version: '3'
+
+networks:
+  network:
+    driver: bridge
+
+volumes:
+  dblocal:
+
+services: 
+  app:
+    build: 
+      context: .
+      # dockerfile: Dockerfile
+    container_name: laravel-mysql_app
+    image: lucban_laravel/mysql
+    ports: 
+      - "8000:80"
+    volumes:
+      - ./:/var/www/html
+      - .config/:/etc/apache2/sites-enabled/
+    depends_on:
+      - database
+    networks:
+      - network
+
+  database:
+    container_name: laravel-mysql_database
+    image: mysql:5.7
+    ports:
+      - '3306:3306'
+    volumes:
+      - dblocal:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    networks:
+      - network
